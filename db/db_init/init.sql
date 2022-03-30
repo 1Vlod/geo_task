@@ -1,0 +1,2 @@
+CREATE TABLE geo_data (ident bigint, lat double precision, lon double precision, speed int, device_timestamp timestamp, server_timestamp timestamp, direction int);
+\copy geo_data FROM '/init_files/data.csv' DELIMITER ',' CSV HEADER

@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - ./db/db_init:/docker-entrypoint-initdb.d
+      - ./db:/var/lib/postgresql/data
+      - ./db/init_files:/init_files
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
