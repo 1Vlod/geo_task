@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PG_CONNECTION } from './constants';
+import { Injectable } from '@nestjs/common';
+import { GeoDataRepository } from './db/pg.repository';
 @Injectable()
 export class AppService {
-  constructor(@Inject(PG_CONNECTION) private conn: any) {}
+  constructor(private geoDataRepository: GeoDataRepository) {}
   getHello(): string {
     return 'Hello World!';
   }
 
-  async getData() {
-    const res = await this.conn.query('SELECT * FROM geo_data');
-    return res.rows;
+  async getData(page?: number, size?: number) {
+    const res = await this.geoDataRepository.get(page, size);
+    return res;
   }
 }

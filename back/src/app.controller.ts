@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -11,7 +11,7 @@ export class AppController {
   }
 
   @Get('geoData')
-  getGeoData() {
-    return this.appService.getData();
+  getGeoData(@Query('page') page?: number, @Query('size') size?: number) {
+    return this.appService.getData(page, size);
   }
 }

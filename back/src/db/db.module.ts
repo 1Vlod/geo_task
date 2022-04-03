@@ -1,17 +1,28 @@
-import { Module } from '@nestjs/common';
+import { Module, OnApplicationShutdown } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ModuleRef } from '@nestjs/core';
 import { Pool } from 'pg';
-import { PG_CONNECTION } from '../constants';
+import { DB_CONNECTION } from 'src/constants';
+import { dbConfigFactory } from './pg.config';
+import { GeoDataRepository } from './pg.repository';
 
-const dbProvider = {
-  provide: PG_CONNECTION,
-  useValue: new Pool({
-    user: 'user',
-    host: 'localhost',
-    database: 'geodb',
-    password: 'password',
-    port: '5432',
-  }),
-};
+@Module({
+  providers: [
+    {
+      provide: DB_CONNECTION,
+      inject: [ConfigService],
+      useFactory: dbConfigFactory,
+    },
+    GeoDataRepository,
+  ],
+  exports: [GeoDataRepository],
+})
+export class DbModule implements OnApplicationShutdown {
+  constructor(private readonly moduleRef: ModuleRef) {}
 
-@Module({ providers: [dbProvider], exports: [dbProvider] })
-export class DbModule {}
+  onApplicationShutdown(signal?: string) {
+    console.log('Shutting down on signal ', signal);
+    const db = this.moduleRef.get(DB_CONNECTION) as Pool;
+    return db.end();
+  }
+}

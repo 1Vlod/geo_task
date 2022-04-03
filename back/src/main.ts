@@ -10,6 +10,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({ logger: true }),
   );
+  app.enableShutdownHooks();
   await app.listen(3000);
 }
 bootstrap();
