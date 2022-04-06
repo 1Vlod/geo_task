@@ -30,4 +30,12 @@ export class AppService {
     });
     return res;
   }
+
+  async getMaxSpeed(params: {
+    busId: string;
+    dateStart: string;
+    dateEnd: string;
+  }) {
+    return this.geoDataRepository.getMaxSpeed(params);
+  }
 }

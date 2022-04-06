@@ -5,3 +5,8 @@ export class GetGeoDataQuery {
   dateEnd?: string;
   busId?: string;
 }
+
+export class GetMaxSpeedQuery {
+  dateStart: string;
+  dateEnd: string;
+}
