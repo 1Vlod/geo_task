@@ -7,8 +7,27 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async getData(page?: number, size?: number) {
-    const res = await this.geoDataRepository.get(page, size);
+  async getData({
+    id,
+    page,
+    size,
+    ...other
+  }: {
+    id?: string;
+    page?: string;
+    size?: string;
+    busId?: string;
+    dateStart?: string;
+    dateEnd?: string;
+  }) {
+    if (id) {
+      return await this.geoDataRepository.getOne(id);
+    }
+    const res = await this.geoDataRepository.get({
+      page: page && +page,
+      size: size && +size,
+      ...other,
+    });
     return res;
   }
 }

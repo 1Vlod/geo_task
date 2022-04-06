@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { AppService } from './app.service';
+import { GetGeoDataQuery } from './dto';
 
 @Controller()
 export class AppController {
@@ -10,8 +11,8 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('geoData')
-  getGeoData(@Query('page') page?: number, @Query('size') size?: number) {
-    return this.appService.getData(page, size);
+  @Get('geoData/:id?')
+  getGeoData(@Query() query: GetGeoDataQuery, @Param('id') id?: string) {
+    return this.appService.getData({...query, id});
   }
 }
