@@ -23,4 +23,12 @@ export class AppController {
   ) {
     return this.appService.getMaxSpeed({ ...query, busId });
   }
+
+  @Get('geoData/distance/:busId')
+  getBusDistance(
+    @Query() query: GetMaxSpeedQuery,
+    @Param('busId', ParseIntPipe) busId: number,
+  ) {
+    return this.appService.getBusDistance({ ...query, busId });
+  }
 }

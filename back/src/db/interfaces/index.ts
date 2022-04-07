@@ -17,8 +17,11 @@ export interface IDBGetQuery {
   dateEnd?: string;
 }
 
-export interface IDBGetMaxSpeedQuery {
+export interface IBusIdFilter {
   busId: number;
+}
+
+export interface IDateFilters {
   dateStart: string;
   dateEnd: string;
 }

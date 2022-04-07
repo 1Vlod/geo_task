@@ -2,13 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
 import { DB_CONNECTION } from 'src/constants';
 import {
-  IDBGetMaxSpeedQuery,
+  IBusIdFilter,
+  IDateFilters,
   IDBGetQuery,
   IGeoDataInstance,
 } from './interfaces';
 
 export interface IGeoDataRepository {
-  get(query: IDBGetQuery): Promise<any>;
+  getOne(id: number): Promise<{ data: IGeoDataInstance }>;
+  get(query: IDBGetQuery): Promise<any>; //TODO: add response interface
+  getMaxSpeed(params: IBusIdFilter & IDateFilters): Promise<any>; //TODO: !!
+  getCoordinates(params: IBusIdFilter & IDateFilters): Promise<any>; //TODO: !!
 }
 
 @Injectable()
@@ -50,7 +54,7 @@ export class GeoDataRepository implements IGeoDataRepository {
     }
   }
 
-  async getMaxSpeed(params: IDBGetMaxSpeedQuery) {
+  async getMaxSpeed(params: IBusIdFilter & IDateFilters) {
     try {
       const whereString = createWhereString(params);
       const queryString = `SELECT MAX(speed) FROM geo_data ${whereString}`;
@@ -64,8 +68,26 @@ export class GeoDataRepository implements IGeoDataRepository {
       throw error;
     }
   }
+
+  async getCoordinates(params: IBusIdFilter & IDateFilters) {
+    try {
+      const whereString = createWhereString(params);
+      const queryString = `SELECT lat, lon FROM geo_data ${whereString} AND lat IS NOT null AND lon IS NOT null`;
+
+      const coordinates = await this.db.query<{ lat: string; lon: string }>(
+        queryString,
+      );
+
+      return {
+        coordinates: coordinates.rows,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
+// TODO: move these functions
 const createWhereString = (params: Omit<IDBGetQuery, 'page' | 'size'>) => {
   const where = [];
   if (params.busId) {
