@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { GetGeoDataQuery, GetMaxSpeedQuery } from './dto';
 
@@ -12,12 +12,15 @@ export class AppController {
   }
 
   @Get('geoData/:id?')
-  getGeoData(@Query() query: GetGeoDataQuery, @Param('id') id?: string) {
-    return this.appService.getData({...query, id});
+  getGeoData(@Query() query: GetGeoDataQuery, @Param('id') id?: number) {
+    return this.appService.getData({ ...query, id });
   }
 
-  @Get('geoData/speed/:busId?')
-  getMaxSpeed(@Query() query: GetMaxSpeedQuery, @Param('busId') busId?: string) {
-    return this.appService.getMaxSpeed({...query, busId});
+  @Get('geoData/speed/:busId')
+  getMaxSpeed(
+    @Query() query: GetMaxSpeedQuery,
+    @Param('busId', ParseIntPipe) busId: number,
+  ) {
+    return this.appService.getMaxSpeed({ ...query, busId });
   }
 }

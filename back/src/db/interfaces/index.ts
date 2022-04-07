@@ -12,13 +12,13 @@ export interface IGeoDataInstance {
 export interface IDBGetQuery {
   page?: number;
   size?: number;
-  busId?: string;
+  busId?: number;
   dateStart?: string;
   dateEnd?: string;
 }
 
 export interface IDBGetMaxSpeedQuery {
-  busId: string;
+  busId: number;
   dateStart: string;
   dateEnd: string;
 }

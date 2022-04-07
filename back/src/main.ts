@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -11,6 +12,12 @@ async function bootstrap() {
     new FastifyAdapter({ logger: true }),
   );
   app.enableShutdownHooks();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
   await app.listen(3000);
 }
 bootstrap();

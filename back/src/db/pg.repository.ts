@@ -14,7 +14,7 @@ export interface IGeoDataRepository {
 @Injectable()
 export class GeoDataRepository implements IGeoDataRepository {
   constructor(@Inject(DB_CONNECTION) private db: Pool) {}
-  async getOne(id: string) {
+  async getOne(id: number) {
     try {
       const data = await this.db.query<IGeoDataInstance>(
         'SELECT * FROM geo_data WHERE id = $1',

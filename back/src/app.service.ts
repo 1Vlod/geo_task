@@ -13,10 +13,10 @@ export class AppService {
     size,
     ...other
   }: {
-    id?: string;
-    page?: string;
-    size?: string;
-    busId?: string;
+    id?: number;
+    page?: number;
+    size?: number;
+    busId?: number;
     dateStart?: string;
     dateEnd?: string;
   }) {
@@ -24,15 +24,15 @@ export class AppService {
       return await this.geoDataRepository.getOne(id);
     }
     const res = await this.geoDataRepository.get({
-      page: page && +page,
-      size: size && +size,
+      page,
+      size,
       ...other,
     });
     return res;
   }
 
   async getMaxSpeed(params: {
-    busId: string;
+    busId: number;
     dateStart: string;
     dateEnd: string;
   }) {
