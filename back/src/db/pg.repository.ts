@@ -6,13 +6,19 @@ import {
   IDateFilters,
   IDBGetQuery,
   IGeoDataInstance,
+  IGetGeoDataResponse,
 } from './interfaces';
+import { createWhereString } from './queryGenerators/whereString';
 
 export interface IGeoDataRepository {
   getOne(id: number): Promise<{ data: IGeoDataInstance }>;
-  get(query: IDBGetQuery): Promise<any>; //TODO: add response interface
-  getMaxSpeed(params: IBusIdFilter & IDateFilters): Promise<any>; //TODO: !!
-  getCoordinates(params: IBusIdFilter & IDateFilters): Promise<any>; //TODO: !!
+  get(query: IDBGetQuery): Promise<IGetGeoDataResponse>;
+  getMaxSpeed(
+    params: IBusIdFilter & IDateFilters,
+  ): Promise<{ maxSpeed: number }>;
+  getCoordinates(
+    params: IBusIdFilter & IDateFilters,
+  ): Promise<{ coordinates: { lon: number; lat: number }[] }>;
 }
 
 @Injectable()
@@ -34,12 +40,15 @@ export class GeoDataRepository implements IGeoDataRepository {
   async get({ page = 1, size = 10, ...other }: IDBGetQuery) {
     try {
       const whereString = createWhereString(other);
-      const dbString = `SELECT * FROM geo_data ${whereString}  OFFSET $1 LIMIT $2`; //TODO: change names of variables to query
-      const dbCountString = `SELECT COUNT(*) FROM geo_data ${whereString}`;
+      const getDataQuery = `SELECT * FROM geo_data ${whereString}  OFFSET $1 LIMIT $2`;
+      const getCountQuery = `SELECT COUNT(*) FROM geo_data ${whereString}`;
       const values = [(page - 1) * size, size];
 
-      const geoData = await this.db.query<IGeoDataInstance>(dbString, values);
-      const totalCount = await this.db.query<{ count: string }>(dbCountString);
+      const geoData = await this.db.query<IGeoDataInstance>(
+        getDataQuery,
+        values,
+      );
+      const totalCount = await this.db.query<{ count: string }>(getCountQuery);
       const count = +totalCount.rows[0].count;
 
       return {
@@ -57,12 +66,12 @@ export class GeoDataRepository implements IGeoDataRepository {
   async getMaxSpeed(params: IBusIdFilter & IDateFilters) {
     try {
       const whereString = createWhereString(params);
-      const queryString = `SELECT MAX(speed) FROM geo_data ${whereString}`;
+      const getMaxSpeedQuery = `SELECT MAX(speed) FROM geo_data ${whereString}`;
 
-      const maxSpeed = await this.db.query<IGeoDataInstance>(queryString);
+      const maxSpeed = await this.db.query<{ max: number }>(getMaxSpeedQuery);
 
       return {
-        maxSpeed: maxSpeed.rows[0],
+        maxSpeed: maxSpeed.rows[0].max,
       };
     } catch (error) {
       throw error;
@@ -72,10 +81,10 @@ export class GeoDataRepository implements IGeoDataRepository {
   async getCoordinates(params: IBusIdFilter & IDateFilters) {
     try {
       const whereString = createWhereString(params);
-      const queryString = `SELECT lat, lon FROM geo_data ${whereString} AND lat IS NOT null AND lon IS NOT null`;
+      const getCoordinatesQuery = `SELECT lat, lon FROM geo_data ${whereString} AND lat IS NOT null AND lon IS NOT null`;
 
-      const coordinates = await this.db.query<{ lat: string; lon: string }>(
-        queryString,
+      const coordinates = await this.db.query<{ lat: number; lon: number }>(
+        getCoordinatesQuery,
       );
 
       return {
@@ -86,33 +95,3 @@ export class GeoDataRepository implements IGeoDataRepository {
     }
   }
 }
-
-// TODO: move these functions
-const createWhereString = (params: Omit<IDBGetQuery, 'page' | 'size'>) => {
-  const where = [];
-  if (params.busId) {
-    where.push(`ident = ${params.busId}`);
-  }
-
-  if (params.dateStart) {
-    if (where.length) {
-      where.push('AND');
-    }
-    where.push(`server_timestamp >= '${getDateStringForPg(params.dateStart)}'`);
-  }
-
-  if (params.dateEnd) {
-    if (where.length) {
-      where.push('AND');
-    }
-    where.push(`server_timestamp <= '${getDateStringForPg(params.dateEnd)}'`);
-  }
-  return where.length ? 'WHERE ' + where.join(' ') : '';
-};
-
-const getDateStringForPg = (date: string) => {
-  const dateObj = new Date(date);
-  return `${dateObj.getUTCFullYear()}-${
-    dateObj.getUTCMonth() + 1
-  }-${dateObj.getUTCDate()} ${dateObj.getUTCHours()}:${dateObj.getUTCMinutes()}:${dateObj.getUTCSeconds()}`;
-};

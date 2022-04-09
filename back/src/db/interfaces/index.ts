@@ -25,3 +25,11 @@ export interface IDateFilters {
   dateStart: string;
   dateEnd: string;
 }
+
+export interface IGetGeoDataResponse {
+  data: IGeoDataInstance[];
+  count: number;
+  page: number;
+  totalPages: number;
+  totalCount: number;
+}
