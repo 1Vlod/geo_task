@@ -12,3 +12,19 @@ services:
       - '5432:5432'
     env_file:
       - .env
+  backend:
+    container_name: backend
+    build:
+      context: ./back/
+      target: development
+    volumes:
+      - ./back/:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - 9229:9229
+    command: npm run start:dev
+    env_file:
+      - .env
+    depends_on:
+      - postgres
