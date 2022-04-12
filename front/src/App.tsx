@@ -1,12 +1,14 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Container } from '@mui/material';
 import './App.css';
-import Example from './Example';
+import Table from './Table';
 
 function App() {
   return (
     <div className="App">
-      <Example />
+      <Container maxWidth="lg">
+        <Table />
+      </Container>
     </div>
   );
 }
