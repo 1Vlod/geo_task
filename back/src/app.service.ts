@@ -39,7 +39,7 @@ export class AppService {
   async getBusDistance(params: IMainParams) {
     const { coordinates } = await this.geoDataRepository.getCoordinates(params);
     return {
-      distance: countDistance(coordinates),
+      distance: countDistance(coordinates).toFixed(2),
     };
   }
 }

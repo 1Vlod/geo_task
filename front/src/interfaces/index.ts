@@ -12,8 +12,8 @@ export interface IGeoDataParams {
   page?: number;
   size?: number;
   busId?: number;
-  dateStart?: string;
-  dateEnd?: string;
+  dateStart?: Date | null;
+  dateEnd?: Date | null;
 }
 
 export interface IGeoDataInstance {
