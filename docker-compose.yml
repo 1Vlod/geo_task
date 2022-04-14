@@ -28,3 +28,11 @@ services:
       - .env
     depends_on:
       - postgres
+      - frontend
+  frontend:
+    container_name: frontend
+    build:
+      context: ./front
+      dockerfile: dockerfile
+    ports:
+      - '3000:3000'
